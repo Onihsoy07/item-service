@@ -3,6 +3,7 @@ package hello.itemservice.web.basic;
 import hello.itemservice.domain.item.AddItemDto;
 import hello.itemservice.domain.item.Item;
 import hello.itemservice.domain.item.ItemRepository;
+import hello.itemservice.domain.item.UpdateItemDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -64,7 +65,7 @@ public class BasicItemController {
 
 //    @PostMapping("/add")
 //    public String saveV3(@ModelAttribute Item item) {
-          //Model 생략 가능, @ModelAttribute value 생략하면 Item -> item 변경 후 자동 Model.addAttribute 넣어줌 
+          //Model 생략 가능, @ModelAttribute value 생략하면 Item -> item 변경 후 자동 Model.addAttribute 넣어줌
 //        itemRepository.save(item);
 //        return "/basic/item";
 //    }
@@ -73,6 +74,26 @@ public class BasicItemController {
     public String saveV4(Item item) {
         itemRepository.save(item);
         return "/basic/item";
+    }
+
+    @GetMapping("/{itemId}/edit")
+    public String editForm(@PathVariable Long itemId,
+                           Model model) {
+        Item item = itemRepository.findById(itemId);
+        model.addAttribute("item", item);
+
+        return "basic/editForm";
+    }
+
+    @PostMapping("/{itemId}/edit")
+    public String edit(@PathVariable long itemId,
+                       UpdateItemDto updateItemDto,
+                       Model model) {
+        itemRepository.update(itemId, updateItemDto);
+        Item item = itemRepository.findById(itemId);
+        model.addAttribute("item", item);
+
+        return "redirect:/basic/items/{itemId}";
     }
 
 
