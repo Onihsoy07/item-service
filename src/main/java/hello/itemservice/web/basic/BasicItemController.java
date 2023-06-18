@@ -109,7 +109,7 @@ public class BasicItemController {
     }
 
     @PostMapping("/{itemId}/edit")
-    public String edit(@PathVariable long itemId,
+    public String edit(@PathVariable Long itemId,
                        UpdateItemDto updateItemDto,
                        Model model) {
         itemRepository.update(itemId, updateItemDto);
@@ -117,6 +117,14 @@ public class BasicItemController {
         model.addAttribute("item", item);
 
         return "redirect:/basic/items/{itemId}";
+    }
+
+    //일단 대충 만듬
+    @GetMapping("/{itemId}/delete")
+    public String delete(@PathVariable Long itemId) {
+        itemRepository.delete(itemId);
+
+        return "redirect:/basic/items";
     }
 
 

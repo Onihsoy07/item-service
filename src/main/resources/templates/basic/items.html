@@ -30,6 +30,7 @@
         <th>상품명</th>
         <th>가격</th>
         <th>수량</th>
+        <th></th>
       </tr>
       </thead>
       <tbody>
@@ -39,6 +40,7 @@
         <td><a href="item.html" th:href="@{/basic/items/{itemId}(itemId=${item.id})}" th:text="${item.itemName}">상품명</a></td>
         <td th:text="${item.price}">가격</td>
         <td th:text="${item.quantity}">갯수</td>
+        <td><button th:onclick="|location.href='@{/basic/items/{itemId}/delete(itemId=${item.id})}'|">삭제</button></td>
       </tr>
 
       </tbody>
@@ -46,6 +48,5 @@
   </div>
 
 </div> <!-- /container -->
-
 </body>
 </html>
