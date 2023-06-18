@@ -70,10 +70,24 @@ public class BasicItemController {
 //        return "/basic/item";
 //    }
 
+
+    /**
+     * 현재 저장 후 /basic/item view 던지는 것을 서버 내부에서 실행 url은 그대로
+     * 그렇기 떄문에 새로고침(마지막 요청 다시 요청)을 하면 post로 요청되어 item 하나가 더 생김
+     * 그래서 PRG(POST/REDIRECT/GET)을 사용해야 한다. PRG는 GET요청을 redirect를 이용하여 불러온다 .
+     * 아래에 수정코드
+     */
+//    @PostMapping("/add")
+//    public String saveV4(Item item) {
+//        itemRepository.save(item);
+//        return "/basic/item";
+//    }
+
+    //POST 후 redirect하여 GET 호출됨(PRG)
     @PostMapping("/add")
-    public String saveV4(Item item) {
+    public String saveV5(Item item) {
         itemRepository.save(item);
-        return "/basic/item";
+        return "redirect:/basic/items/" + item.getId();
     }
 
     @GetMapping("/{itemId}/edit")
