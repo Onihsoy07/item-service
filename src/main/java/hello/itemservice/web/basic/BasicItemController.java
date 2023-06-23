@@ -114,7 +114,7 @@ public class BasicItemController {
 
     @PostMapping("/{itemId}/edit")
     public String edit(@PathVariable Long itemId,
-                       UpdateItemDto updateItemDto,
+                       Item updateItemDto,
                        Model model) {
         itemRepository.update(itemId, updateItemDto);
         Item item = itemRepository.findById(itemId);
