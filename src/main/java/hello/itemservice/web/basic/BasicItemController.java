@@ -1,9 +1,6 @@
 package hello.itemservice.web.basic;
 
-import hello.itemservice.domain.item.AddItemDto;
-import hello.itemservice.domain.item.Item;
-import hello.itemservice.domain.item.ItemRepository;
-import hello.itemservice.domain.item.UpdateItemDto;
+import hello.itemservice.domain.item.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -32,6 +29,12 @@ public class BasicItemController {
         regions.put("BUSAN", "부산");
         regions.put("JEJU", "제주");
         return regions;
+    }
+
+    @ModelAttribute("itemTypes")
+    public ItemType[] itemTypes() {
+        //enum의 모든 정보를 배열로 반환
+        return ItemType.values();
     }
 
 
@@ -111,6 +114,7 @@ public class BasicItemController {
     public String saveV5(Item item, RedirectAttributes redirectAttributes) {
         log.info("item.open={}", item.getOpen());
         log.info("item.regions={}", item.getRegions());
+        log.info("item.itmeType={}", item.getItemType());
 
 
         Item savedItem = itemRepository.save(item);
