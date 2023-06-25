@@ -1,9 +1,9 @@
-logging:
-  level:
-    org:
-      apache:
-        coyote:
-          http11: debug
+#logging:
+#  level:
+#    org:
+#      apache:
+#        coyote:
+#          http11: debug
 
 #messages 위치 설정(기본은 messages임)
 spring:
