@@ -6,6 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -117,37 +120,78 @@ public class BasicItemController {
 //        return "redirect:/basic/items/" + item.getId();
 //    }
 
-    @PostMapping("/add")
-    public String saveV5(Item item, RedirectAttributes redirectAttributes, Model model) {
+//    @PostMapping("/add")
+//    public String saveV5(Item item,
+//                         RedirectAttributes redirectAttributes,
+//                         Model model) {
+//
+//        //검증 오류 결과 보관
+//        Map<String, String> errors = new HashMap<>();
+//
+//        //검증 로직
+//        if (!StringUtils.hasText(item.getItemName())) {
+//            errors.put("itemName", "상품 이름은 필수입니다.");
+//        }
+//        if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
+//            errors.put("price", "가격은 1,000~1,000,000까지 허용합니다");
+//        }
+//        if (item.getQuantity() == null || item.getQuantity() >= 9999 || item.getQuantity() <= 0) {
+//            errors.put("quantity", "수량은 0~9,999까지 허용합니다.");
+//        }
+//
+//        //복합 검증
+//        if (item.getPrice() != null && item.getQuantity() != null) {
+//            int resultPrice = item.getPrice() * item.getQuantity();
+//            if (resultPrice < 10000) {
+////                errors.put("globalError", "가격 * 수량의 합이 10,000원 이상 허용합니다. 현재 총 가격 : " + resultPrice);
+//            }
+//        }
+//
+//        //검증 실패하면 model 넣어주고 입력폼으로
+//        if (!errors.isEmpty()) {
+//            log.info("error = {}", errors);
+//            return "basic/addForm";
+//        }
+//
+//        //성공로직
+//        log.info("item.open={}", item.getOpen());
+//        log.info("item.regions={}", item.getRegions());
+//        log.info("item.itemType={}", item.getItemType());
+//
+//
+//        Item savedItem = itemRepository.save(item);
+//        redirectAttributes.addAttribute("itemId", savedItem.getId());
+//        redirectAttributes.addAttribute("status", true);
+//        return "redirect:/basic/items/{itemId}";
+//    }
 
-        //검증 오류 결과 보관
-        Map<String, String> errors = new HashMap<>();
+    @PostMapping("/add")
+    public String addItemV1(Item item,
+                         BindingResult bindingResult,
+                         RedirectAttributes redirectAttributes) {
 
         //검증 로직
         if (!StringUtils.hasText(item.getItemName())) {
-            errors.put("itemName", "상품 이름은 필수입니다.");
+            bindingResult.addError(new FieldError("item", "itemName", "상품 이름은 필수입니다."));
         }
         if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
-            errors.put("price", "가격은 1,000~1,000,000까지 허용합니다");
+            bindingResult.addError(new FieldError("item", "price", "가격은 1,000~1,000,000까지 허용합니다"));
         }
         if (item.getQuantity() == null || item.getQuantity() >= 9999 || item.getQuantity() <= 0) {
-            errors.put("quantity", "수량은 0~9,999까지 허용합니다.");
+            bindingResult.addError(new FieldError("item", "quantity", "수량은 0~9,999까지 허용합니다."));
         }
-        
+
         //복합 검증
         if (item.getPrice() != null && item.getQuantity() != null) {
             int resultPrice = item.getPrice() * item.getQuantity();
             if (resultPrice < 10000) {
-                errors.put("globalError", "가격 * 수량의 합이 10,000원 이상 허용합니다. 현재 총 가격 : " + resultPrice);
+                bindingResult.addError(new ObjectError("item", "가격 * 수량의 합이 10,000원 이상 허용합니다. 현재 총 가격 : " + resultPrice));
             }
         }
 
         //검증 실패하면 model 넣어주고 입력폼으로
-        if (!errors.isEmpty()) {
-            for (String error : errors.values()) {
-                log.info("error = {}", error);
-            }
-            model.addAttribute("errors", errors);
+        if (bindingResult.hasErrors()) {
+            log.info("error = {}", bindingResult);
             return "basic/addForm";
         }
 
