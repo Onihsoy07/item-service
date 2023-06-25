@@ -165,7 +165,7 @@ public class BasicItemController {
 //        return "redirect:/basic/items/{itemId}";
 //    }
 
-    @PostMapping("/add")
+//    @PostMapping("/add")
     public String addItemV1(Item item,
                          BindingResult bindingResult,
                          RedirectAttributes redirectAttributes) {
@@ -186,6 +186,48 @@ public class BasicItemController {
             int resultPrice = item.getPrice() * item.getQuantity();
             if (resultPrice < 10000) {
                 bindingResult.addError(new ObjectError("item", "가격 * 수량의 합이 10,000원 이상 허용합니다. 현재 총 가격 : " + resultPrice));
+            }
+        }
+
+        //검증 실패하면 model 넣어주고 입력폼으로
+        if (bindingResult.hasErrors()) {
+            log.info("error = {}", bindingResult);
+            return "basic/addForm";
+        }
+
+        //성공로직
+        log.info("item.open={}", item.getOpen());
+        log.info("item.regions={}", item.getRegions());
+        log.info("item.itemType={}", item.getItemType());
+
+
+        Item savedItem = itemRepository.save(item);
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/basic/items/{itemId}";
+    }
+
+    @PostMapping("/add")
+    public String addItemV2(Item item,
+                            BindingResult bindingResult,
+                            RedirectAttributes redirectAttributes) {
+
+        //검증 로직
+        if (!StringUtils.hasText(item.getItemName())) {
+            bindingResult.addError(new FieldError("item", "itemName", item.getItemName(), false, null, null, "상품 이름은 필수입니다."));
+        }
+        if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
+            bindingResult.addError(new FieldError("item", "price", item.getPrice(), false, null, null, "가격은 1,000~1,000,000까지 허용합니다"));
+        }
+        if (item.getQuantity() == null || item.getQuantity() >= 9999 || item.getQuantity() <= 0) {
+            bindingResult.addError(new FieldError("item", "quantity", item.getQuantity(), false, null, null, "수량은 0~9,999까지 허용합니다."));
+        }
+
+        //복합 검증
+        if (item.getPrice() != null && item.getQuantity() != null) {
+            int resultPrice = item.getPrice() * item.getQuantity();
+            if (resultPrice < 10000) {
+                bindingResult.addError(new ObjectError("item", null, null, "가격 * 수량의 합이 10,000원 이상 허용합니다. 현재 총 가격 : " + resultPrice));
             }
         }
 
