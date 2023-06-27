@@ -1,6 +1,7 @@
 package hello.itemservice.web.basic;
 
 import hello.itemservice.domain.item.*;
+import hello.itemservice.web.validation.ItemValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -23,6 +24,7 @@ import java.util.*;
 public class BasicItemController {
 
     private final ItemRepository itemRepository;
+    private final ItemValidator itemValidator;
 
     //현제 클래스 모든 컨트롤러 model에 addAtrribute됨
     @ModelAttribute("regions")
@@ -292,7 +294,7 @@ public class BasicItemController {
         return "redirect:/basic/items/{itemId}";
     }
 
-    @PostMapping("/add")
+//    @PostMapping("/add")
     public String addItemV4(Item item,
                             BindingResult bindingResult,
                             RedirectAttributes redirectAttributes) {
@@ -317,6 +319,33 @@ public class BasicItemController {
             if (resultPrice < 10000) {
                 bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
             }
+        }
+
+        //검증 실패하면 model 넣어주고 입력폼으로
+        if (bindingResult.hasErrors()) {
+            log.info("error = {}", bindingResult);
+            return "basic/addForm";
+        }
+
+        //성공로직
+        log.info("item.open={}", item.getOpen());
+        log.info("item.regions={}", item.getRegions());
+        log.info("item.itemType={}", item.getItemType());
+
+
+        Item savedItem = itemRepository.save(item);
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/basic/items/{itemId}";
+    }
+
+    @PostMapping("/add")
+    public String addItemV5(Item item,
+                            BindingResult bindingResult,
+                            RedirectAttributes redirectAttributes) {
+
+        if (itemValidator.supports(item.getClass())) {
+            itemValidator.validate(item, bindingResult);
         }
 
         //검증 실패하면 model 넣어주고 입력폼으로
