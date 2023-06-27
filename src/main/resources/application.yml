@@ -8,4 +8,4 @@
 #messages 위치 설정(기본은 messages임)
 spring:
   messages:
-    basename: messages, config.i18n.messages, errors
+    basename: messages, errors
