@@ -417,11 +417,26 @@ public class BasicItemController {
 
     @PostMapping("/{itemId}/edit")
     public String edit(@PathVariable Long itemId,
-                       Item updateItemDto,
+                       @Validated @ModelAttribute Item item,
+                       BindingResult bindingResult,
                        Model model) {
-        itemRepository.update(itemId, updateItemDto);
-        Item item = itemRepository.findById(itemId);
-        model.addAttribute("item", item);
+
+        //복합 검증
+        if (item.getPrice() != null && item.getQuantity() != null) {
+            int resultPrice = item.getPrice() * item.getQuantity();
+            if (resultPrice < 10000) {
+                bindingResult.addError(new ObjectError("item", "가격 * 수량의 합이 10,000원 이상 허용합니다. 현재 총 가격 : " + resultPrice));
+            }
+        }
+
+        if (bindingResult.hasErrors()) {
+            log.info("errors={}", bindingResult);
+            return "basic/editForm";
+        }
+
+        itemRepository.update(itemId, item);
+        Item updateItem = itemRepository.findById(itemId);
+        model.addAttribute("item", updateItem);
 
         return "redirect:/basic/items/{itemId}";
     }
