@@ -406,7 +406,7 @@ public class BasicItemController {
         return "redirect:/basic/items/{itemId}";
     }
 
-    @PostMapping("/add")
+//    @PostMapping("/add")
     public String addItemV7(@Validated(SaveCheck.class) @ModelAttribute Item item,
                             BindingResult bindingResult,
                             RedirectAttributes redirectAttributes) {
@@ -430,6 +430,37 @@ public class BasicItemController {
         log.info("item.regions={}", item.getRegions());
         log.info("item.itemType={}", item.getItemType());
 
+
+        Item savedItem = itemRepository.save(item);
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/basic/items/{itemId}";
+    }
+
+    @PostMapping("/add")
+    public String addItemV8(@Validated @ModelAttribute("item") SaveItemDto saveItemDto,
+                            BindingResult bindingResult,
+                            RedirectAttributes redirectAttributes) {
+
+        //복합 검증
+        if (saveItemDto.getPrice() != null && saveItemDto.getQuantity() != null) {
+            int resultPrice = saveItemDto.getPrice() * saveItemDto.getQuantity();
+            if (resultPrice < 10000) {
+                bindingResult.addError(new ObjectError("item", "가격 * 수량의 합이 10,000원 이상 허용합니다. 현재 총 가격 : " + resultPrice));
+            }
+        }
+
+        //검증 실패하면 model 넣어주고 입력폼으로
+        if (bindingResult.hasErrors()) {
+            log.info("error = {}", bindingResult);
+            return "basic/addForm";
+        }
+
+        Item item = new Item().builder()
+                .itemName(saveItemDto.getItemName())
+                .price(saveItemDto.getPrice())
+                .quantity(saveItemDto.getQuantity())
+                .build();
 
         Item savedItem = itemRepository.save(item);
         redirectAttributes.addAttribute("itemId", savedItem.getId());
