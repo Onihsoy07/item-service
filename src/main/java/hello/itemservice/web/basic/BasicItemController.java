@@ -380,6 +380,14 @@ public class BasicItemController {
                             BindingResult bindingResult,
                             RedirectAttributes redirectAttributes) {
 
+        //복합 검증
+        if (item.getPrice() != null && item.getQuantity() != null) {
+            int resultPrice = item.getPrice() * item.getQuantity();
+            if (resultPrice < 10000) {
+                bindingResult.addError(new ObjectError("item", "가격 * 수량의 합이 10,000원 이상 허용합니다. 현재 총 가격 : " + resultPrice));
+            }
+        }
+
         //검증 실패하면 model 넣어주고 입력폼으로
         if (bindingResult.hasErrors()) {
             log.info("error = {}", bindingResult);
