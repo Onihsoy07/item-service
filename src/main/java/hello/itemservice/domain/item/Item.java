@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Range;
+import org.hibernate.validator.constraints.ScriptAssert;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotBlank;
@@ -13,6 +14,8 @@ import java.util.List;
 
 @Getter @Setter
 @NoArgsConstructor
+//ObjectError 기능이 약하여 controller에서 넣는 것을 권장
+@ScriptAssert(lang = "javascript", script = "_this.price * _this.quantity >= 10000", message = "총합 10,000원 이상 허용합니다.")
 public class Item {
 
     private Long id;
