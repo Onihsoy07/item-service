@@ -503,7 +503,7 @@ public class BasicItemController {
         return "redirect:/basic/items/{itemId}";
     }
 
-    @PostMapping("/{itemId}/edit")
+//    @PostMapping("/{itemId}/edit")
     public String editV2(@PathVariable Long itemId,
                        @Validated(UpdateCheck.class) @ModelAttribute Item item,
                        BindingResult bindingResult,
@@ -521,6 +521,38 @@ public class BasicItemController {
             log.info("errors={}", bindingResult);
             return "basic/editForm";
         }
+
+        itemRepository.update(itemId, item);
+        Item updateItem = itemRepository.findById(itemId);
+        model.addAttribute("item", updateItem);
+
+        return "redirect:/basic/items/{itemId}";
+    }
+
+    @PostMapping("/{itemId}/edit")
+    public String editV3(@PathVariable Long itemId,
+                       @Validated @ModelAttribute("item") UpdateItemDto updateItemDto,
+                       BindingResult bindingResult,
+                       Model model) {
+
+        //복합 검증
+        if (updateItemDto.getPrice() != null && updateItemDto.getQuantity() != null) {
+            int resultPrice = updateItemDto.getPrice() * updateItemDto.getQuantity();
+            if (resultPrice < 10000) {
+                bindingResult.addError(new ObjectError("item", "가격 * 수량의 합이 10,000원 이상 허용합니다. 현재 총 가격 : " + resultPrice));
+            }
+        }
+
+        if (bindingResult.hasErrors()) {
+            log.info("errors={}", bindingResult);
+            return "basic/editForm";
+        }
+
+        Item item = new Item().builder()
+                .itemName(updateItemDto.getItemName())
+                .price(updateItemDto.getPrice())
+                .quantity(updateItemDto.getQuantity())
+                .build();
 
         itemRepository.update(itemId, item);
         Item updateItem = itemRepository.findById(itemId);
