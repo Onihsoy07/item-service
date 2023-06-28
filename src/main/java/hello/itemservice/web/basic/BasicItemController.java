@@ -26,13 +26,13 @@ import java.util.*;
 public class BasicItemController {
 
     private final ItemRepository itemRepository;
-    private final ItemValidator itemValidator;
+//    private final ItemValidator itemValidator;
 
     //현재 컨트롤러에서 @Validater로 검증 사용가능
-    @InitBinder
-    public void init(WebDataBinder webDataBinder) {
-        webDataBinder.addValidators(itemValidator);
-    }
+//    @InitBinder
+//    public void init(WebDataBinder webDataBinder) {
+//        webDataBinder.addValidators(itemValidator);
+//    }
 
 
     //현제 클래스 모든 컨트롤러 model에 addAtrribute됨
@@ -353,9 +353,32 @@ public class BasicItemController {
                             BindingResult bindingResult,
                             RedirectAttributes redirectAttributes) {
 
-        if (itemValidator.supports(item.getClass())) {
-            itemValidator.validate(item, bindingResult);
+//        if (itemValidator.supports(item.getClass())) {
+//            itemValidator.validate(item, bindingResult);
+//        }
+
+        //검증 실패하면 model 넣어주고 입력폼으로
+        if (bindingResult.hasErrors()) {
+            log.info("error = {}", bindingResult);
+            return "basic/addForm";
         }
+
+        //성공로직
+        log.info("item.open={}", item.getOpen());
+        log.info("item.regions={}", item.getRegions());
+        log.info("item.itemType={}", item.getItemType());
+
+
+        Item savedItem = itemRepository.save(item);
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/basic/items/{itemId}";
+    }
+
+    @PostMapping("/add")
+    public String addItemV6(@Validated @ModelAttribute Item item,
+                            BindingResult bindingResult,
+                            RedirectAttributes redirectAttributes) {
 
         //검증 실패하면 model 넣어주고 입력폼으로
         if (bindingResult.hasErrors()) {
@@ -382,29 +405,6 @@ public class BasicItemController {
         model.addAttribute("item", item);
 
         return "basic/editForm";
-    }
-
-    @PostMapping("/add")
-    public String addItemV6(@Validated Item item,
-                            BindingResult bindingResult,
-                            RedirectAttributes redirectAttributes) {
-
-        //검증 실패하면 model 넣어주고 입력폼으로
-        if (bindingResult.hasErrors()) {
-            log.info("error = {}", bindingResult);
-            return "basic/addForm";
-        }
-
-        //성공로직
-        log.info("item.open={}", item.getOpen());
-        log.info("item.regions={}", item.getRegions());
-        log.info("item.itemType={}", item.getItemType());
-
-
-        Item savedItem = itemRepository.save(item);
-        redirectAttributes.addAttribute("itemId", savedItem.getId());
-        redirectAttributes.addAttribute("status", true);
-        return "redirect:/basic/items/{itemId}";
     }
 
     @PostMapping("/{itemId}/edit")
