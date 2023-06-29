@@ -34,7 +34,6 @@ public class BasicItemController {
 //        webDataBinder.addValidators(itemValidator);
 //    }
 
-
     //현제 클래스 모든 컨트롤러 model에 addAtrribute됨
     @ModelAttribute("regions")
     public Map<String, String> regions() {
