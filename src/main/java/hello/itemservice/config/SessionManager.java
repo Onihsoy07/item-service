@@ -47,7 +47,7 @@ public class SessionManager {
         return sessionStore.get(cookie.getValue());
     }
 
-    /**
+    /**cookie.getValue()
      * 세션 만료
      */
     public void expire(HttpServletRequest request) {
