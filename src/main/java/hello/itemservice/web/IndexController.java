@@ -3,6 +3,7 @@ package hello.itemservice.web;
 import hello.itemservice.config.SessionManager;
 import hello.itemservice.domain.member.Member;
 import hello.itemservice.domain.member.MemberRepository;
+import hello.itemservice.web.argumentResolver.Login;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -76,9 +77,20 @@ public class IndexController {
     }
 
 //    @SessionAttribute는 세션을 찾을 때만 사용(생성 안됨)
-    @GetMapping({"", "/"})
+//    @GetMapping({"", "/"})
     public String indexLoginV3Spring(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember,
                                      Model model) {
+
+        if (loginMember == null) {
+            return "home";
+        }
+
+        model.addAttribute("member", loginMember);
+        return "loginHome";
+    }
+
+    @GetMapping({"", "/"})
+    public String indexLoginV3ArgumentResolver(@Login Member loginMember, Model model) {
 
         if (loginMember == null) {
             return "home";
