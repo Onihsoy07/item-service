@@ -9,3 +9,9 @@
 spring:
   messages:
     basename: messages, errors
+
+#Http Session생성 후 응답에 쿠키 넣을 때 url에 tracking-mode 없애는 방법
+server:
+  servlet:
+    session:
+      tracking-modes: cookie
